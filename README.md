@@ -1,4 +1,4 @@
-# json_api [![Build Status](https://travis-ci.org/jreinert/crystal-jsonapi.svg?branch=master)](https://travis-ci.org/jreinert/crystal-jsonapi)
+# JSONApi [![Build Status](https://travis-ci.org/jreinert/crystal-jsonapi.svg?branch=master)](https://travis-ci.org/jreinert/crystal-jsonapi)
 
 [JSON API](http://jsonapi.org) Serializers for Crystal
 
