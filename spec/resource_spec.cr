@@ -15,10 +15,20 @@ class AttributesTestResource < JSONApi::Resource
   end
 end
 
+record RelationshipMock, foo do
+  def to_json(io)
+    io.json_object do |object|
+      object.field(:foo, @foo)
+    end
+  end
+end
+
 class RelationshipsTestResource < JSONApi::Resource
+  def initialize(@id, @relationship)
+  end
+
   def relationships(object, io)
-    object.field(:related_test, attr_one)
-    object.field(:related_tests, resource.attr_two)
+    object.field(:related_test, @relationship)
   end
 end
 
@@ -100,6 +110,30 @@ describe JSONApi::Resource do
       end
 
       self_link.should eq("/api_test/v1/test_resources/1")
+    end
+
+    it "adds an relationships object if relationships is implemented" do
+      resource = RelationshipsTestResource.new(1, RelationshipMock.new("bar"))
+      test_value = nil
+      json_object(resource) do |key, pull|
+        case(key)
+        when "relationships"
+          pull.read_object do |key|
+            case(key)
+            when "related_test"
+              pull.read_object do |key|
+                case(key)
+                when "foo" then test_value = pull.read_string
+                else pull.skip
+                end
+              end
+            else pull.skip
+            end
+          end
+        else pull.skip
+        end
+      end
+      test_value.should eq("bar")
     end
   end
 end

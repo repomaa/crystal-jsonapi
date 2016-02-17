@@ -23,6 +23,7 @@ module JSONApi
         object.field(:type, type)
         object.field(:id, id.to_s)
         serialize_attributes(object, io)
+        serialize_relationships(object, io)
         serialize_links(object, io)
       end
     end
@@ -32,6 +33,15 @@ module JSONApi
       object.field(:attributes) do
         io.json_object do |object|
           self.attributes(object, io)
+        end
+      end
+    end
+
+    private def serialize_relationships(object, io)
+      return unless self.responds_to?(:relationships)
+      object.field(:relationships) do
+        io.json_object do |object|
+          self.relationships(object, io)
         end
       end
     end
