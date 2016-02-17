@@ -2,8 +2,12 @@ module JSONApi
   abstract class Resource
     getter id
 
+    def self.type
+      @@type || "#{name.split("::").last.underscore}s"
+    end
+
     def type
-      @@type || "#{self.class.name.split("::").last.underscore}s"
+      self.class.type
     end
 
     def self_link
