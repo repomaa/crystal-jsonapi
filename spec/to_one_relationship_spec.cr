@@ -1,0 +1,65 @@
+require "./spec_helper"
+
+record ResourceMock, id do
+  def self_link
+    "#{API_ROOT}/resource_mocks/#{@id}"
+  end
+end
+
+record RepositoryMock do
+  def related_id(resource, name)
+    2
+  end
+end
+
+class TestToOneRelationship < JSONApi::ToOneRelationship(ResourceMock)
+  def initialize
+    super(ResourceMock.new(1), RepositoryMock.new, "other_resources", "resource_mocks")
+  end
+end
+
+describe JSONApi::ToOneRelationship do
+  context "#to_json" do
+    it "contains a correct data object" do
+      relationship = TestToOneRelationship.new
+      type, id = { nil, nil }
+      json_object(relationship) do |key, pull|
+        case(key)
+        when "data"
+          pull.read_object do |key|
+            case(key)
+            when "type" then type = pull.read_string
+            when "id" then id = pull.read_string
+            else raise("unsupported key #{key}")
+            end
+          end
+        else pull.skip
+        end
+      end
+
+      type.should eq("resource_mocks")
+      id.should eq("2")
+    end
+
+    it "contains a correct links object" do
+      relationship = TestToOneRelationship.new
+      self_link, related_link = { nil, nil }
+      json_object(relationship) do |key, pull|
+        case(key)
+        when "links"
+          pull.read_object do |key|
+            case(key)
+            when "self" then self_link = pull.read_string
+            when "related" then related_link = pull.read_string
+            else raise("unsupported key #{key}")
+            end
+          end
+        else pull.skip
+        end
+
+        self_link.should eq("/api_test/v1/resource_mocks/1/relationships/other_resources")
+        related_link.should eq("/api_test/v1/resource_mocks/1/other_resources")
+      end
+    end
+  end
+end
