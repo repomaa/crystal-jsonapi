@@ -35,6 +35,23 @@ describe JSONApi::ToOneRelationship do
       id.should eq("2")
     end
 
+    it "sets the relationship data to null if id is nil" do
+      relationship = JSONApi::ToOneRelationship.new(
+        ResourceMock.new(1).self_link,
+        "other_resources",
+        "resource_mocks",
+        nil
+      )
+
+      json_object(relationship) do |key, pull|
+        case(key)
+        when "data"
+          pull.read_null
+        else pull.skip
+        end
+      end
+    end
+
     it "contains a correct links object" do
       relationship = TestToOneRelationship.new
       self_link, related_link = { nil, nil }
