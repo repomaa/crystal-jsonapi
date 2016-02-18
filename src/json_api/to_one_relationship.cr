@@ -1,12 +1,18 @@
 require "./relationship"
 require "./resource_identifier"
+require "./cacheable"
 
 module JSONApi
-  class ToOneRelationship(T) < Relationship(T)
+  class ToOneRelationship < Relationship
+    cache_key @resource_link, @name, @type, @id
+
+    def initialize(resource_link, name, type, @id)
+      super(resource_link, name, type)
+      @resource_identifier = ResourceIdentifier.new(type, @id)
+    end
+
     protected def serialize_data(io)
-      @repository.related_id(@resource, @name).try { |id|
-        ResourceIdentifier.new(@type, id)
-      }.to_json(io)
+      @resource_identifier.to_json(io)
     end
   end
 end

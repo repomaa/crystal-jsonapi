@@ -1,12 +1,17 @@
+require "./cacheable"
+
 module JSONApi
   class ResourceCollection(T)
-    def initialize(@resources : (Iterable(T) | Enumerable(T)), @self_link = "#{API_ROOT}/#{T.type}")
+    include Cacheable
+    cache_key @resources, @self_link
+
+    def initialize(@resources : Enumerable(T), @self_link = "#{API_ROOT}/#{T.type}")
     end
 
     private def serialize_data(io)
       io.json_array do |array|
         @resources.each do |resource|
-          array << resource
+          array.push { resource.to_cached_json(io) }
         end
       end
     end
@@ -17,7 +22,7 @@ module JSONApi
       end
     end
 
-    def to_json(io)
+    def to_cached_json(io)
       io.json_object do |object|
         object.field(:links) { serialize_links(io) }
         object.field(:data) { serialize_data(io) }

@@ -1,19 +1,23 @@
+require "./cacheable"
 module JSONApi
-  abstract class Relationship(T)
-    def initialize(@resource : T, @repository, @name, @type)
+  abstract class Relationship
+    include Cacheable
+
+    def initialize(@resource_link, @name, @type)
     end
 
     protected abstract def serialize_data(io)
 
+
     def self_link
-      "#{@resource.self_link}/relationships/#{@name}"
+      "#{@resource_link}/relationships/#{@name}"
     end
 
     def related_link
-      "#{@resource.self_link}/#{@name}"
+      "#{@resource_link}/#{@name}"
     end
 
-    def to_json(io)
+    def to_cached_json(io)
       io.json_object do |object|
         object.field(:links) { serialize_links(io) }
         object.field(:data) { serialize_data(io) }

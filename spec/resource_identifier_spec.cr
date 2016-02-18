@@ -1,13 +1,13 @@
 require "./spec_helper"
 
 describe JSONApi::ResourceIdentifier do
-  describe ".new" do
+  context ".new" do
     it "receives a type and an id" do
       JSONApi::ResourceIdentifier.new("test", 1)
     end
   end
 
-  describe "#to_json" do
+  context "#to_json" do
     it "returns a json object" do
       identifier = JSONApi::ResourceIdentifier.new("test", 1)
       json_object(identifier)

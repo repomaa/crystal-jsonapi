@@ -27,7 +27,7 @@ record ResourceMock, id do
     "#{API_ROOT}/resource_mocks/#{@id}"
   end
 
-  def to_json(io)
+  def to_cached_json(io)
     io.json_object do |object|
       object.field(:id, @id.to_s)
     end

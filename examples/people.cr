@@ -27,43 +27,35 @@ class PeopleRepository
   def children_of(person)
     all.select { |p| [p.mother_id, p.father_id].includes?(person.id) }
   end
-
-  def related_ids(person, relation)
-    case(relation)
-    when "friends" then person.friend_ids
-    when "children" then children_of(person).map(&.id)
-    else raise "unknown to many relationship #{relation}"
-    end
-  end
-
-  def related_id(person, relation)
-    case(relation)
-    when "mother" then person.mother_id
-    when "father" then person.father_id
-    else raise "unknown to one relationship #{relation}"
-    end
-  end
 end
 
 $people_repository = PeopleRepository.new
 
 class Person < JSONApi::Resource
   @@type = "people" # needs to be set for irregular plural forms only
+  cache_key @id, @name, @age, @mother_id, @father_id, @friends_ids, children
 
   getter name, age, mother_id, father_id, friend_ids, mother, father, friends, children
   def initialize(@id, @name, @age, @mother_id, @father_id, @friend_ids = [] of Int32)
     @mother = JSONApi::ToOneRelationship.new(
-      self, $people_repository, "mother", "people"
+      self_link, "mother", "people", @mother_id
     )
     @father = JSONApi::ToOneRelationship.new(
-      self, $people_repository, "father", "people"
+      self_link, "father", "people", @father_id
     )
     @friends = JSONApi::ToManyRelationship.new(
-      self, $people_repository, "friends", "people"
+      self_link, "friends", "people", @friend_ids
     )
-    @children = JSONApi::ToManyRelationship.new(
-      self, $people_repository, "children", "people"
+  end
+
+  def children
+    @children ||= JSONApi::ToManyRelationship.new(
+      self_link, "children", "people", child_ids
     )
+  end
+
+  def child_ids
+    @child_ids ||= $people_repository.children_of(self).map(&.id)
   end
 
   def attributes(object, io)
@@ -81,4 +73,4 @@ end
 
 people = $people_repository.all
 
-puts JSONApi::ResourceCollection.new(people).to_pretty_json
+puts JSONApi::ResourceCollection.new(people).to_json

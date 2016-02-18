@@ -6,15 +6,9 @@ record ResourceMock, id do
   end
 end
 
-record RepositoryMock do
-  def related_id(resource, name)
-    2
-  end
-end
-
-class TestToOneRelationship < JSONApi::ToOneRelationship(ResourceMock)
+class TestToOneRelationship < JSONApi::ToOneRelationship
   def initialize
-    super(ResourceMock.new(1), RepositoryMock.new, "other_resources", "resource_mocks")
+    super(ResourceMock.new(1).self_link, "other_resources", "resource_mocks", 2)
   end
 end
 

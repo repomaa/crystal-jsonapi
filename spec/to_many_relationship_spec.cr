@@ -1,14 +1,8 @@
 require "./spec_helper"
 
-record RepositoryMock do
-  def related_ids(resource, name)
-    [1,2,3]
-  end
-end
-
-class TestToManyRelationship < JSONApi::ToManyRelationship(ResourceMock)
+class TestToManyRelationship < JSONApi::ToManyRelationship
   def initialize
-    super(ResourceMock.new(1), RepositoryMock.new, "other_resources", "resource_mocks")
+    super(ResourceMock.new(1).self_link, "other_resources", "resource_mocks", [1,2,3])
   end
 end
 
