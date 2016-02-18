@@ -33,42 +33,28 @@ $people_repository = PeopleRepository.new
 
 class Person < JSONApi::Resource
   @@type = "people" # needs to be set for irregular plural forms only
-  cache_key @id, @name, @age, @mother_id, @father_id, @friends_ids, children
+  cache_key id, attributes, relationships
 
-  getter name, age, mother_id, father_id, friend_ids, mother, father, friends, children
+  getter mother_id, father_id, friend_ids
   def initialize(@id, @name, @age, @mother_id, @father_id, @friend_ids = [] of Int32)
-    @mother = JSONApi::ToOneRelationship.new(
-      self_link, "mother", "people", @mother_id
-    )
-    @father = JSONApi::ToOneRelationship.new(
-      self_link, "father", "people", @father_id
-    )
-    @friends = JSONApi::ToManyRelationship.new(
-      self_link, "friends", "people", @friend_ids
-    )
   end
 
-  def children
-    @children ||= JSONApi::ToManyRelationship.new(
-      self_link, "children", "people", child_ids
-    )
-  end
+  relationships({
+    mother: { to: :one, type: :people },
+    father: { to: :one, type: :people },
+    friends: { to: :many, type: :people, keys: @friend_ids },
+    children: { to: :many, type: :people, keys: child_ids }
+  })
+
+  attributes({
+    name: String,
+    age: Int32
+  })
 
   def child_ids
     @child_ids ||= $people_repository.children_of(self).map(&.id)
   end
 
-  def attributes(object, io)
-    object.field(:name, name)
-    object.field(:age, age)
-  end
-
-  def relationships(object, io)
-    object.field(:mother, mother)
-    object.field(:father, father)
-    object.field(:friends, friends)
-    object.field(:children, children)
-  end
 end
 
 people = $people_repository.all

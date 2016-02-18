@@ -4,6 +4,74 @@ module JSONApi
   abstract class Resource
     include Cacheable
 
+    macro relationships(map)
+      {% for key, value in map %}
+        {% map[key] = { to: value } unless value.is_a?(HashLiteral) %}
+      {% end %}
+
+      {% for key, value in map %}
+        def {{key.id}}
+          {% type = "JSONApi::To#{value[:to].id.camelcase}Relationship".id %}
+          @{{key.id}} ||= {{type}}.new(
+            self_link,
+            {{key.id.stringify}},
+            {% if value[:type] %}
+              {{value[:type].id.stringify}},
+            {% else %}
+              "{{key.id}}{{(value[:to].id.stringify == "one" ? "s" : "").id}}",
+            {% end %}
+            {% if value[:key] %}
+              {{value[:key].id}}
+            {% elsif value[:keys] %}
+              {{value[:keys].id}}
+            {% else %}
+              @{{key.id}}_id{{(value[:to].id.stringify == "many" ? "s" : "").id}}
+            {% end %}
+          )
+        end
+      {% end %}
+
+      def relationships(object, io)
+        {% for key, value in map %}
+          object.field({{key}}, {{key.id}})
+        {% end %}
+      end
+
+      def relationships
+        @relationships ||= {
+          {% for key, value in map %}
+            {{key.id}}: {{key.id}},
+          {% end %}
+        }
+      end
+    end
+
+    macro attributes(map)
+      {% for key, value in map %}
+        {% map[key] = { type: value } unless value.is_a?(HashLiteral) %}
+      {% end %}
+
+      {% for key, value in map %}
+        def {{key.id}} : {{value[:type]}}{{(value[:nilable] == true ? "?" : "").id}}
+          @{{key.id}}
+        end
+      {% end %}
+
+      def attributes(object, io)
+        {% for key, value in map %}
+          object.field({{key}}) { {{key.id}}.to_json(io) }
+        {% end %}
+      end
+
+      def attributes
+        @attributes ||= {
+          {% for key, value in map %}
+            {{key.id}}: {{key.id}},
+          {% end %}
+        }
+      end
+    end
+
     getter id
 
     def self.type

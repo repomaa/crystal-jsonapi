@@ -8,15 +8,15 @@ class TestResource < JSONApi::Resource
 end
 
 class AttributesTestResource < JSONApi::Resource
-  cache_key @id, @attr_one, @attr_two
+  cache_key id, attributes
 
   def initialize(@id, @attr_one, @attr_two)
   end
 
-  def attributes(object, io)
-    object.field(:attr_one, @attr_one)
-    object.field(:attr_two, @attr_two)
-  end
+  attributes({
+    attr_one: String,
+    attr_two: Int32
+  })
 end
 
 record RelationshipMock, foo do
@@ -30,12 +30,12 @@ end
 class RelationshipsTestResource < JSONApi::Resource
   cache_key @id, @relationship
 
-  def initialize(@id, @relationship)
+  def initialize(@id, @related_test_id)
   end
 
-  def relationships(object, io)
-    object.field(:related_test, @relationship)
-  end
+  relationships({
+    related_test: :one
+  })
 end
 
 describe JSONApi::Resource do
@@ -119,8 +119,9 @@ describe JSONApi::Resource do
     end
 
     it "adds an relationships object if relationships is implemented" do
-      resource = RelationshipsTestResource.new(1, RelationshipMock.new("bar"))
-      test_value = nil
+      expected_id = 2
+      id = nil
+      resource = RelationshipsTestResource.new(1, expected_id)
       json_object(resource) do |key, pull|
         case(key)
         when "relationships"
@@ -129,7 +130,13 @@ describe JSONApi::Resource do
             when "related_test"
               pull.read_object do |key|
                 case(key)
-                when "foo" then test_value = pull.read_string
+                when "data"
+                  pull.read_object do |key|
+                    case(key)
+                    when "id" then id = pull.read_string
+                    else pull.skip
+                    end
+                  end
                 else pull.skip
                 end
               end
@@ -139,7 +146,7 @@ describe JSONApi::Resource do
         else pull.skip
         end
       end
-      test_value.should eq("bar")
+      id.should eq(expected_id.to_s)
     end
   end
 end

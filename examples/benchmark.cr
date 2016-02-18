@@ -4,16 +4,11 @@ require "benchmark"
 API_ROOT = "/example/v1"
 
 class Person < JSONApi::Resource
-  cache_key @id, @name, @age, @mother_id, @father_id, @friend_ids, children
 end
 
 class PeopleRepository
   def all
     RandomPersonIterator.new
-  end
-
-  def children_of(person)
-    all.select { |p| [p.mother_id, p.father_id].includes?(person.id) }.take(rand(0..5))
   end
 
   class RandomPersonIterator
@@ -36,7 +31,7 @@ class PeopleRepository
         rand(0..10).times { friend_ids << rand(0...@current_id) }
       end
       friend_ids.uniq
-      Person.new(name, age, mother_id, father_id, friend_ids)
+      Person.new(@current_id, name, age, mother_id, father_id, friend_ids)
     end
   end
 end
@@ -45,40 +40,22 @@ $people_repository = PeopleRepository.new
 
 class Person < JSONApi::Resource
   @@type = "people" # needs to be set for irregular plural forms only
+  cache_key id, attributes, relationships
 
-  getter name, age, mother_id, father_id, friend_ids, mother, father, friends
+  getter mother_id, father_id, friend_ids
   def initialize(@id, @name, @age, @mother_id, @father_id, @friend_ids = [] of Int32)
-    @mother = JSONApi::ToOneRelationship.new(
-      self_link, "mother", "people", @mother_id
-    )
-    @father = JSONApi::ToOneRelationship.new(
-      self_link, "father", "people", @father_id
-    )
-    @friends = JSONApi::ToManyRelationship.new(
-      self_link, "friends", "people", @friend_ids
-    )
   end
 
-  def children
-    @children ||= JSONApi::ToManyRelationship.new(
-      self_link, "children", "people", child_ids
-    )
-  end
+  relationships({
+    mother: { to: :one, type: :people },
+    father: { to: :one, type: :people },
+    friends: { to: :many, type: :people, keys: @friend_ids },
+  })
 
-  def child_ids
-    @child_ids ||= $people_repository.children_of(self).map(&.id)
-  end
-
-  def attributes(object, io)
-    object.field(:name, name)
-    object.field(:age, age)
-  end
-
-  def relationships(object, io)
-    object.field(:mother, mother)
-    object.field(:father, father)
-    object.field(:friends, friends)
-  end
+  attributes({
+    name: String,
+    age: Int32
+  })
 end
 
 class NopIO
