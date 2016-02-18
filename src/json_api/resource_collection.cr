@@ -5,7 +5,7 @@ module JSONApi
     include Cacheable
     cache_key @resources, @self_link
 
-    def initialize(@resources : Enumerable(T), @self_link = "#{API_ROOT}/#{T.type}")
+    def initialize(@resources : (Iterator(T) | Enumerable(T)), @self_link = "#{API_ROOT}/#{T.type}")
     end
 
     private def serialize_data(io)
