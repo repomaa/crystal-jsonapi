@@ -1,0 +1,401 @@
+{
+  "links": {
+    "self": "/example/v1/people"
+  },
+  "data": [
+    {
+      "type": "people",
+      "id": "1",
+      "attributes": {
+        "name": "Tim",
+        "age": 25
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/1/relationships/mother",
+            "related": "/example/v1/people/1/mother"
+          },
+          "data": {
+            "type": "people",
+            "id": "2"
+          }
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/1/relationships/father",
+            "related": "/example/v1/people/1/father"
+          },
+          "data": {
+            "type": "people",
+            "id": "3"
+          }
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/1/relationships/friends",
+            "related": "/example/v1/people/1/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "4"
+            },
+            {
+              "type": "people",
+              "id": "5"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/1/relationships/children",
+            "related": "/example/v1/people/1/children"
+          },
+          "data": [
+
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/1"
+      }
+    },
+    {
+      "type": "people",
+      "id": "2",
+      "attributes": {
+        "name": "Betty",
+        "age": 55
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/2/relationships/mother",
+            "related": "/example/v1/people/2/mother"
+          },
+          "data": null
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/2/relationships/father",
+            "related": "/example/v1/people/2/father"
+          },
+          "data": null
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/2/relationships/friends",
+            "related": "/example/v1/people/2/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "6"
+            },
+            {
+              "type": "people",
+              "id": "7"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/2/relationships/children",
+            "related": "/example/v1/people/2/children"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "1"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/2"
+      }
+    },
+    {
+      "type": "people",
+      "id": "3",
+      "attributes": {
+        "name": "John",
+        "age": 57
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/3/relationships/mother",
+            "related": "/example/v1/people/3/mother"
+          },
+          "data": null
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/3/relationships/father",
+            "related": "/example/v1/people/3/father"
+          },
+          "data": null
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/3/relationships/friends",
+            "related": "/example/v1/people/3/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "6"
+            },
+            {
+              "type": "people",
+              "id": "7"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/3/relationships/children",
+            "related": "/example/v1/people/3/children"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "1"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/3"
+      }
+    },
+    {
+      "type": "people",
+      "id": "4",
+      "attributes": {
+        "name": "Jessica",
+        "age": 24
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/4/relationships/mother",
+            "related": "/example/v1/people/4/mother"
+          },
+          "data": {
+            "type": "people",
+            "id": "6"
+          }
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/4/relationships/father",
+            "related": "/example/v1/people/4/father"
+          },
+          "data": {
+            "type": "people",
+            "id": "7"
+          }
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/4/relationships/friends",
+            "related": "/example/v1/people/4/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "1"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/4/relationships/children",
+            "related": "/example/v1/people/4/children"
+          },
+          "data": [
+
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/4"
+      }
+    },
+    {
+      "type": "people",
+      "id": "5",
+      "attributes": {
+        "name": "Paul",
+        "age": 25
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/5/relationships/mother",
+            "related": "/example/v1/people/5/mother"
+          },
+          "data": {
+            "type": "people",
+            "id": "6"
+          }
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/5/relationships/father",
+            "related": "/example/v1/people/5/father"
+          },
+          "data": {
+            "type": "people",
+            "id": "7"
+          }
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/5/relationships/friends",
+            "related": "/example/v1/people/5/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "1"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/5/relationships/children",
+            "related": "/example/v1/people/5/children"
+          },
+          "data": [
+
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/5"
+      }
+    },
+    {
+      "type": "people",
+      "id": "6",
+      "attributes": {
+        "name": "Lisa",
+        "age": 56
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/6/relationships/mother",
+            "related": "/example/v1/people/6/mother"
+          },
+          "data": null
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/6/relationships/father",
+            "related": "/example/v1/people/6/father"
+          },
+          "data": null
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/6/relationships/friends",
+            "related": "/example/v1/people/6/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "2"
+            },
+            {
+              "type": "people",
+              "id": "3"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/6/relationships/children",
+            "related": "/example/v1/people/6/children"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "4"
+            },
+            {
+              "type": "people",
+              "id": "5"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/6"
+      }
+    },
+    {
+      "type": "people",
+      "id": "7",
+      "attributes": {
+        "name": "Mark",
+        "age": 58
+      },
+      "relationships": {
+        "mother": {
+          "links": {
+            "self": "/example/v1/people/7/relationships/mother",
+            "related": "/example/v1/people/7/mother"
+          },
+          "data": null
+        },
+        "father": {
+          "links": {
+            "self": "/example/v1/people/7/relationships/father",
+            "related": "/example/v1/people/7/father"
+          },
+          "data": null
+        },
+        "friends": {
+          "links": {
+            "self": "/example/v1/people/7/relationships/friends",
+            "related": "/example/v1/people/7/friends"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "2"
+            },
+            {
+              "type": "people",
+              "id": "3"
+            }
+          ]
+        },
+        "children": {
+          "links": {
+            "self": "/example/v1/people/7/relationships/children",
+            "related": "/example/v1/people/7/children"
+          },
+          "data": [
+            {
+              "type": "people",
+              "id": "4"
+            },
+            {
+              "type": "people",
+              "id": "5"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "/example/v1/people/7"
+      }
+    }
+  ]
+}

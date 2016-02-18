@@ -15,7 +15,8 @@ dependencies:
 
 ## Usage
 
-See [examples/people.cr](examples/people.cr) for a real-world example.
+See [examples/people.cr](examples/people.cr) for a real-world example and
+[examples/people.out.json](examples/people.out.json) for the generated output.
 
 
 ## Contributing
