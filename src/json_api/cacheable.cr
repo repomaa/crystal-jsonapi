@@ -13,12 +13,10 @@ module JSONApi
       def_hash self.cache_key
     end
 
-    macro included
-      def to_json(io)
-        cache = JSONApi::Cache.instance
-        cache.fetch(self.hash, io) do |cache_record|
-          to_cached_json(cache_record)
-        end
+    def to_json(io)
+      cache = JSONApi::Cache.instance
+      cache.fetch(self.hash, io) do |cache_record|
+        to_cached_json(cache_record)
       end
     end
   end
