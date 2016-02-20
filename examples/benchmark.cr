@@ -6,37 +6,31 @@ API_ROOT = "/example/v1"
 class Person < JSONApi::Resource
 end
 
-class PeopleRepository
-  def all
-    RandomPersonIterator.new
+class RandomPersonIterator
+  include Iterator(Person)
+  def initialize
+    @pos = 0_u64
+    pull = JSON::PullParser.new(File.open("examples/names.json"))
+    @names = [] of String
+    pull.read_array { @names << pull.read_string }
   end
 
-  class RandomPersonIterator
-    include Iterator(Person)
-    def initialize
-      @current_id = 0
-      pull = JSON::PullParser.new(File.open("examples/names.json"))
-      @names = [] of String
-      pull.read_array { @names << pull.read_string }
+  def next
+    name = @names.sample
+    age = rand(5..85)
+    mother_id, father_id, friend_ids = { nil, nil, [] of Int32 }
+    if @pos > 0
+      mother_id = rand(0...@pos)
+      father_id = rand(0...@pos)
+      father_id = nil if father_id == mother_id
+      rand(0..10).times { friend_ids << rand(0...@pos) }
     end
-
-    def next
-      name = @names.sample
-      age = rand(5..85)
-      mother_id, father_id, friend_ids = { nil, nil, [] of Int32 }
-      if @current_id > 0
-        mother_id = rand(0...@current_id)
-        father_id = rand(0...@current_id)
-        father_id = nil if father_id == mother_id
-        rand(0..10).times { friend_ids << rand(0...@current_id) }
-      end
-      friend_ids.uniq
-      Person.new(@current_id, name, age, mother_id, father_id, friend_ids)
-    end
+    friend_ids.uniq!
+    person = Person.new(@pos, name, age, mother_id, father_id, friend_ids)
+    @pos += 1
+    person
   end
 end
-
-$people_repository = PeopleRepository.new
 
 class Person < JSONApi::Resource
   @@type = "people" # needs to be set for irregular plural forms only
@@ -58,91 +52,203 @@ class Person < JSONApi::Resource
   })
 end
 
-class NopIO
+class CountIO
   include IO
 
+  getter size
+  def initialize
+    @size = 0_u64
+  end
+
   def write(slice)
+    @size += slice.size
     #nop
   end
 
   def read(slice)
     #nop
   end
+
+  def reset
+    @size = 0_u64
+  end
 end
 
-module Util
-  extend self
+class BenchmarkUtils
+  getter people
+
+  def initialize
+    @iterator = RandomPersonIterator.new
+    @count_io = CountIO.new
+    @total_records = 0
+    @people = @iterator
+  end
+
+  def fill_people(total_records)
+    @total_records = total_records
+    @people = @iterator.take(@total_records).to_a.each.cycle
+  end
 
   def human(bytes)
     result = bytes.to_f
     suffix_index = 0
-    suffixes = ["  ", "Ki", "Mi", "Gi"]
-    while result > 1000
-      result /= 1024
+    suffixes = ["", "K", "M", "G"]
+    while result > 999
+      result /= 1000
       suffix_index += 1
     end
-    "#{result.round(2).to_s.rjust(6)} #{suffixes[suffix_index]}"
+    "#{result.round(2)} #{suffixes[suffix_index]}"
   end
 
   def stopwatch
     started = Time.now
     yield
-    puts "Time to finish: #{Time.now - started}"
-  end
-end
-
-class ByteCounter < NopIO
-  def initialize
-    @count = 0_u64
+    Time.now - started
   end
 
-  def write(slice)
-    @count += slice.size
-  end
-
-  def report
-    "#{Util.human(@count)}B"
-  end
-
-  def reset
-    @count = 0
-  end
-end
-
-nop_io = NopIO.new
-
-collection_size = (2**10).to_i
-
-counter = ByteCounter.new
-people = $people_repository.all
-collection = JSONApi::ResourceCollection.new(people.take(collection_size))
-collection.to_json(counter)
-puts "serializing #{collection_size} related people (JSON size: #{counter.report})"
-
-[0, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30].each do |power|
-  cache_size = (2**power).to_i
-
-  JSONApi::Cache.setup_with_size(cache_size)
-  runs = 0
-  Benchmark.ips do |x|
-    x.report("Using cache size of #{Util.human(cache_size)}B") do
-      collection = JSONApi::ResourceCollection.new(people.take(collection_size))
-      collection.to_json(nop_io)
-      runs += 1
+  def cache_stats(size, hits, misses)
+    String.build do |io|
+      io.print "Cache:".ljust(20)
+      io.puts %w(Allocated Hits Misses Hit-Ratio).map(&.rjust(15)).join
+      io.print " " * 20
+      io.puts [
+        "#{human(size)}B",
+        human(hits),
+        human(misses),
+        (hits.to_f / (hits + misses)).round(2).to_s
+      ].map(&.rjust(15)).join
     end
   end
 
-  size = JSONApi::Cache.instance.current_size
-  hits = JSONApi::Cache.instance.hit_count
-  misses = JSONApi::Cache.instance.miss_count
+  def time_stats(seconds, requests)
+    String.build do |io|
+      io.print "Time:".ljust(50)
+      io.puts [
+        "#{seconds.round(2)}s",
+        "#{human(requests / seconds)}R/s"
+      ].map(&.rjust(15)).join
+      io.puts "-" * 80
+    end
+  end
 
-  puts "Cache stats for #{runs} requests:"
-  puts " Allocated        Hits      Misses   Hit-Ratio"
-  puts [
-    "#{Util.human(size)}B",
-    Util.human(hits),
-    Util.human(misses),
-    JSONApi::Cache.instance.hit_ratio.round(2).to_s
-  ].map(&.rjust(9)).join("   ")
-  puts
+  def stats(seconds, requests, cache_size, cache_hits, cache_misses)
+    String.build do |io|
+      io.puts cache_stats(cache_size, cache_hits, cache_misses)
+      io.puts time_stats(seconds, requests)
+    end
+  end
+
+  def heading(text, type = "=")
+    String.build do |io|
+      io.puts(text)
+      io.puts(type * 80)
+      io.puts
+    end
+  end
+
+  def h1(text)
+    String.build do |io|
+      puts "=" * 80
+      io << heading(text, "=")
+    end
+  end
+
+  def h2(text)
+    heading(text, "-")
+  end
+
+  def bm_heading(cache_size)
+    if cache_size == 0
+      puts h1("Simulating requests with cache disabled")
+    else
+      puts h1([
+        "Simulating requests using a cache of".ljust(60),
+        "#{human(cache_size)}B".rjust(20)
+      ].join)
+    end
+  end
+
+  def collections(requests, collection_size, cache = nil)
+    puts h2(
+      "#{human(requests)} collection fetches of #{human(collection_size)} " \
+      "records each out of a total of #{human(@total_records)} records"
+    )
+
+    time = stopwatch {
+      requests.times do
+        collection = JSONApi::ResourceCollection.new(people.take(collection_size))
+        collection.to_json(@count_io)
+      end
+    }
+
+    if cache
+      puts stats(time.total_seconds, requests, cache.current_size, cache.hit_count, cache.miss_count)
+    else
+      puts time_stats(time.total_seconds, requests)
+    end
+  end
+
+  def single_resources(requests, cache = nil)
+    puts h2("#{human(requests)} single reasource fetches")
+    time = stopwatch {
+      people.take(requests).each { |person| person.to_json(@count_io) }
+    }
+
+    if cache
+      puts stats(time.total_seconds, requests, cache.current_size, cache.hit_count, cache.miss_count)
+    else
+      puts time_stats(time.total_seconds, requests)
+    end
+  end
+
+  def mixed(requests, collection_size, cache = nil)
+    puts h2("#{human(requests)} randomly mixed fetches (20% collection and 80% single resource)")
+
+    time = stopwatch {
+      requests.times do
+        if rand > 0.2
+          people.take(1).each { |person| person.to_json(@count_io) }
+        else
+          collection = JSONApi::ResourceCollection.new(people.take(collection_size))
+          collection.to_json(@count_io)
+        end
+      end
+    }
+
+    if cache
+      puts stats(time.total_seconds, requests, cache.current_size, cache.hit_count, cache.miss_count)
+    else
+      puts time_stats(time.total_seconds, requests)
+    end
+  end
+
+  def run_benchmarks(config)
+    config.each do |setup|
+      cache_size, size_factor = setup
+      cache = JSONApi::Cache.setup_with_size(cache_size.to_i)
+      fill_people((size_factor * 2**15).to_i)
+      bm_heading(cache_size)
+      (1..2).each do |i|
+        collections(500, (1024 * size_factor).to_i, cache_size == 0 ? nil : cache)
+        single_resources(1_000_000, cache_size == 0 ? nil : cache)
+        mixed(5000, (1024 * size_factor).to_i, cache_size == 0 ? nil : cache)
+        print "Total size of rendered JSON:".ljust(60)
+        puts "#{human(@count_io.size)}B".rjust(20)
+        puts
+        @count_io.reset
+        break if cache_size == 0 || i == 2
+        puts h2("Second iteration...")
+      end
+    end
+  end
 end
+
+util = BenchmarkUtils.new
+util.run_benchmarks([
+  {0, 1},
+  {2**27, 1},
+  {0, 4},
+  {2**28, 4},
+  {0, 8},
+  {2**29, 8},
+])

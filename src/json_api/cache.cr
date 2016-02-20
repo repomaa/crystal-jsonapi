@@ -47,7 +47,12 @@ module JSONApi
       @hit_count / (@hit_count + @miss_count).to_f
     end
 
-    def fetch(hash, io, &block : (Record) ->)
+    def fetch(hash, io, &block : (IO) ->)
+      if @max_size == 0
+        block.call(io)
+        return
+      end
+
       if @cache.has_key?(hash)
         @hit_count += 1
         cache_record = @cache[hash]
