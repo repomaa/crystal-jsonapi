@@ -75,7 +75,7 @@ module JSONApi
     getter id
 
     def self.type
-      @@type || "#{name.split("::").last.underscore}s"
+      @@type ||= "#{name.split("::").last.underscore}s"
     end
 
     def type
