@@ -8,7 +8,7 @@ end
 
 class TestToOneRelationship < JSONApi::ToOneRelationship
   def initialize
-    super(ResourceMock.new(1).self_link, "other_resources", "resource_mocks", 2)
+    super("other_resources", "resource_mocks", 2, ResourceMock.new(1).self_link)
   end
 end
 
@@ -37,7 +37,6 @@ describe JSONApi::ToOneRelationship do
 
     it "sets the relationship data to null if id is nil" do
       relationship = JSONApi::ToOneRelationship.new(
-        ResourceMock.new(1).self_link,
         "other_resources",
         "resource_mocks",
         nil

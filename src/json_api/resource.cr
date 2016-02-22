@@ -13,7 +13,6 @@ module JSONApi
         def {{key.id}}
           {% type = "JSONApi::To#{value[:to].id.camelcase}Relationship".id %}
           @{{key.id}} ||= {{type}}.new(
-            self_link,
             {{key.id.stringify}},
             {% if value[:type] %}
               {{value[:type].id.stringify}},
@@ -21,12 +20,13 @@ module JSONApi
               "{{key.id}}{{(value[:to].id.stringify == "one" ? "s" : "").id}}",
             {% end %}
             {% if value[:key] %}
-              {{value[:key].id}}
+              {{value[:key].id}},
             {% elsif value[:keys] %}
-              {{value[:keys].id}}
+              {{value[:keys].id}},
             {% else %}
-              @{{key.id}}_id{{(value[:to].id.stringify == "many" ? "s" : "").id}}
+              @{{key.id}}_id{{(value[:to].id.stringify == "many" ? "s" : "").id}},
             {% end %}
+            self_link
           )
         end
       {% end %}

@@ -4,8 +4,8 @@ require "./cacheable"
 
 module JSONApi
   class ToOneRelationship < Relationship
-    def initialize(resource_link, name, type, @id)
-      super(resource_link, name, type)
+    def initialize(name, type, @id, resource_link = nil)
+      super(name, type, resource_link)
       @resource_identifier = @id.try { |id| ResourceIdentifier.new(type, id) }
     end
 

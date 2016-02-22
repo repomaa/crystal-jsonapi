@@ -3,10 +3,12 @@ module JSONApi
   abstract class Relationship
     include Cacheable
 
-    getter self_link, related_link
-    def initialize(@resource_link, @name, @type)
-      @self_link = "#{@resource_link}/relationships/#{@name}"
-      @related_link = "#{@resource_link}/#{@name}"
+    getter name, type
+    def initialize(@name, @type, @resource_link = nil)
+      @resource_link.try do |resource_link|
+        @self_link = "#{resource_link}/relationships/#{@name}"
+        @related_link = "#{resource_link}/#{@name}"
+      end
     end
 
     protected abstract def serialize_data(io)
@@ -20,8 +22,8 @@ module JSONApi
 
     private def serialize_links(io)
       io.json_object do |object|
-        object.field(:self, self_link)
-        object.field(:related, related_link)
+        object.field(:self, @self_link)
+        object.field(:related, @related_link)
       end
     end
   end
