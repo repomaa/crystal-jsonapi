@@ -3,7 +3,6 @@ require "./cacheable"
 module JSONApi
   class ResourceIdentifier
     include Cacheable
-    cache_key @type, @id
 
     def initialize(@type, @id)
     end

@@ -2,7 +2,6 @@ require "./spec_helper"
 
 class CacheableTest
   include JSONApi::Cacheable
-  cache_key @foo, @bar
 
   def initialize(@foo, @bar)
   end
@@ -17,15 +16,22 @@ end
 
 class TimesCalledTest
   include JSONApi::Cacheable
-  cache_key @foo, @bar
 
-  getter times_called
+  @@times_called = 0
+
+  def self.times_called
+    @@times_called
+  end
+
+  def self.reset
+    @@times_called = 0
+  end
+
   def initialize(@foo, @bar)
-    @times_called = 0
   end
 
   def to_cached_json(io)
-    @times_called += 1
+    @@times_called += 1
     io.json_object do |object|
       object.field(:foo, @foo)
       object.field(:bar, @bar)
@@ -47,9 +53,10 @@ describe JSONApi::Cacheable do
 
       test.to_json
       test.to_json
-      test.times_called.should eq(1)
+      TimesCalledTest.times_called.should eq(1)
+      TimesCalledTest.reset
       other_test.to_json
-      other_test.times_called.should eq(0)
+      TimesCalledTest.times_called.should eq(0)
     end
   end
 end

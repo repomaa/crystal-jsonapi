@@ -33,7 +33,6 @@ $people_repository = PeopleRepository.new
 
 class Person < JSONApi::Resource
   @@type = "people" # needs to be set for irregular plural forms only
-  cache_key id, attributes, relationships
 
   getter mother_id, father_id, friend_ids
   def initialize(@id, @name, @age, @mother_id, @father_id, @friend_ids = [] of Int32)

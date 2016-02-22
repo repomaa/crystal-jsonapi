@@ -1,15 +1,11 @@
 require "./spec_helper"
 
 class TestResource < JSONApi::Resource
-  cache_key @id
-
   def initialize(@id)
   end
 end
 
 class AttributesTestResource < JSONApi::Resource
-  cache_key id, attributes
-
   def initialize(@id, @attr_one, @attr_two)
   end
 
@@ -28,8 +24,6 @@ record RelationshipMock, foo do
 end
 
 class RelationshipsTestResource < JSONApi::Resource
-  cache_key @id, @relationship
-
   def initialize(@id, @related_test_id)
   end
 
