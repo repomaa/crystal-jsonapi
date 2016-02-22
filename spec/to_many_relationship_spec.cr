@@ -1,11 +1,5 @@
 require "./spec_helper"
 
-class TestToManyRelationship < JSONApi::ToManyRelationship
-  def initialize
-    super("other_resources", "resource_mocks", [1,2,3], ResourceMock.new(1).self_link)
-  end
-end
-
 describe JSONApi::ToManyRelationship do
   context "#to_json" do
     it "contains a correct data object" do

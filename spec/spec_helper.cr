@@ -33,3 +33,20 @@ record ResourceMock, id do
     end
   end
 end
+
+class TestToManyRelationship < JSONApi::ToManyRelationship
+  def initialize
+    super("other_resources", "resource_mocks", [1,2,3], ResourceMock.new(1).self_link)
+  end
+end
+
+class TestToOneRelationship < JSONApi::ToOneRelationship
+  def initialize
+    super("other_resources", "resource_mocks", 2, ResourceMock.new(1).self_link)
+  end
+end
+
+class TestErrorResponse < JSONApi::ErrorResponse
+  protected def serialize_links(object, io)
+  end
+end

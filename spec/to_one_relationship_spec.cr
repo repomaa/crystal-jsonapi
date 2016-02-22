@@ -1,17 +1,5 @@
 require "./spec_helper"
 
-record ResourceMock, id do
-  def self_link
-    "#{API_ROOT}/resource_mocks/#{@id}"
-  end
-end
-
-class TestToOneRelationship < JSONApi::ToOneRelationship
-  def initialize
-    super("other_resources", "resource_mocks", 2, ResourceMock.new(1).self_link)
-  end
-end
-
 describe JSONApi::ToOneRelationship do
   context "#to_json" do
     it "contains a correct data object" do
