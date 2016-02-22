@@ -18,7 +18,10 @@ def json_object(serializer)
   end
 end
 
-record ResourceMock, id do
+class ResourceMock < JSONApi::Resource
+  def initialize(@id)
+  end
+
   def self.type
     "resource_mocks"
   end

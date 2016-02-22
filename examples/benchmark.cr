@@ -175,7 +175,9 @@ class BenchmarkUtils
 
     time = stopwatch {
       requests.times do
-        collection = JSONApi::ResourceCollection.new(people.take(collection_size))
+        collection = JSONApi::ResourceCollectionResponse.new(
+          people.take(collection_size), "#{API_ROOT}/people"
+        )
         collection.to_json(@count_io)
       end
     }
@@ -208,7 +210,9 @@ class BenchmarkUtils
         if rand > 0.2
           people.take(1).each { |person| person.to_json(@count_io) }
         else
-          collection = JSONApi::ResourceCollection.new(people.take(collection_size))
+          collection = JSONApi::ResourceCollectionResponse.new(
+            people.take(collection_size), "#{API_ROOT}/people"
+          )
           collection.to_json(@count_io)
         end
       end

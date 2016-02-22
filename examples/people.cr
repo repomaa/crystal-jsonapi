@@ -58,4 +58,4 @@ end
 
 people = $people_repository.all
 
-puts JSONApi::ResourceCollection.new(people).to_json
+puts JSONApi::ResourceCollectionResponse.new(people, "#{API_ROOT}/people").to_json
