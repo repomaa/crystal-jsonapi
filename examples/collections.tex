@@ -1,0 +1,36 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[binary-units]{siunitx}
+\pgfplotsset{compat=1.12}
+\usetikzlibrary[pgfplots.units]
+\usepackage{fontspec}
+\setmainfont{Droid Sans}
+
+\begin{document}
+\begin{tikzpicture}
+	\begin{loglogaxis}[
+		title={Serializing collection requests},
+		log ticks with fixed point,
+		x unit={\si{\byte}}, x unit prefix={\si{\mebi}},
+		xlabel={Avg. size of serialized JSON per request},
+		ylabel={Requests per second},
+		legend cell align=left,
+		legend style={at={(1.4,1)}, anchor=north east, align=left},
+		grid=major
+	]
+		\addlegendimage{empty legend}
+		\addlegendentry{\hspace{-.5cm}\textbf{Cache size}}
+		\foreach \size in {32, 64, 128, 256, 512, 1024}{
+			\addplot+[no marks] table {collections-\size.dat};
+			\edef\temp{
+				\noexpand\addlegendentry{\SI{\size}{\mebi\byte}}
+			}
+			\temp
+		}
+
+		\addplot+[no marks] table {collections-ref.dat};
+		\addlegendentry{No cache}
+	\end{loglogaxis}
+\end{tikzpicture}
+\end{document}

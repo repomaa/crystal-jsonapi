@@ -2,6 +2,18 @@
 
 [JSON API](http://jsonapi.org) Serializers for Crystal
 
+## Features
+
+- Easy serialization of basic JSON API objects
+- Built in caching support
+
+## Performance
+
+JSONApi is very fast. Thanks to the built in caching support it outperforms
+vanilla .to_json by almost an order of magnitude. See the following graphic.
+
+![Performance plot](https://cdn.rawgit.com/jreinert/crystal-jsonapi/master/examples/collections.svg)
+
 ## Installation
 
 Add this to your application's `shard.yml`:
