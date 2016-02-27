@@ -4,13 +4,16 @@ require "./cacheable"
 
 module JSONApi
   class ToOneRelationship < Relationship
-    def initialize(name, type, @id, resource_link = nil)
+    def initialize(name, type, @id = :none, resource_link = nil)
       super(name, type, resource_link)
-      @resource_identifier = @id.try { |id| ResourceIdentifier.new(type, id) }
+      if (id = @id) && (id != :none)
+        @resource_identifier = ResourceIdentifier.new(type, id)
+      end
     end
 
-    protected def serialize_data(io)
-      @resource_identifier.to_json(io)
+    protected def serialize_data(object, io)
+      return if @id == :none
+      object.field(:data, @resource_identifier)
     end
   end
 end

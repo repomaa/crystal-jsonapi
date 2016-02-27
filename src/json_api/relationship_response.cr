@@ -8,9 +8,7 @@ module JSONApi
     end
 
     protected def serialize_data(object, io)
-      object.field(:data) do
-        @relationship.serialize_data(io)
-      end
+      @relationship.serialize_data(object, io)
     end
 
     protected def serialize_links(object, io)

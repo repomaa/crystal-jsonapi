@@ -43,9 +43,21 @@ class TestToManyRelationship < JSONApi::ToManyRelationship
   end
 end
 
+class TestToManyRelationshipWithoutIds < JSONApi::ToManyRelationship
+  def initialize
+    super("other_resources", "resource_mocks", resource_link: ResourceMock.new(1).self_link)
+  end
+end
+
 class TestToOneRelationship < JSONApi::ToOneRelationship
   def initialize
     super("other_resources", "resource_mocks", 2, ResourceMock.new(1).self_link)
+  end
+end
+
+class TestToOneRelationshipWithoutId < JSONApi::ToOneRelationship
+  def initialize
+    super("other_resources", "resource_mocks", resource_link: ResourceMock.new(1).self_link)
   end
 end
 

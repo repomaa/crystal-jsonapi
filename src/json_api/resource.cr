@@ -23,10 +23,8 @@ module JSONApi
               {{value[:key].id}},
             {% elsif value[:keys] %}
               {{value[:keys].id}},
-            {% else %}
-              @{{key.id}}_id{{(value[:to].id.stringify == "many" ? "s" : "").id}},
             {% end %}
-            self_link
+            resource_link: self_link
           )
         end
       {% end %}

@@ -45,5 +45,16 @@ describe JSONApi::ToManyRelationship do
         related_link.should eq("/api_test/v1/resource_mocks/1/other_resources")
       end
     end
+
+    it "omits the data object if no ids are given" do
+      relationship = TestToManyRelationshipWithoutIds.new
+      json_object(relationship) do |key, pull|
+        case(key)
+        when "data"
+          fail "relationship should contain no data"
+        else pull.skip
+        end
+      end
+    end
   end
 end

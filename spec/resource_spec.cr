@@ -28,7 +28,7 @@ class RelationshipsTestResource < JSONApi::Resource
   end
 
   relationships({
-    related_test: :one
+    related_test: { to: :one, key: @related_test_id }
   })
 end
 

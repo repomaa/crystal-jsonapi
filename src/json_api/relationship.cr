@@ -11,12 +11,12 @@ module JSONApi
       end
     end
 
-    protected abstract def serialize_data(io)
+    protected abstract def serialize_data(object, io)
 
     def to_cached_json(io)
       io.json_object do |object|
         object.field(:links) { serialize_links(io) }
-        object.field(:data) { serialize_data(io) }
+        serialize_data(object, io)
       end
     end
 
