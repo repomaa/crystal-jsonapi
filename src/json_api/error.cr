@@ -3,11 +3,12 @@ require "./has_meta"
 require "./error_source"
 
 module JSONApi
-  class Error
+  class Error < Exception
     include Cacheable
     include HasMeta
 
     def initialize(@code : String, @title : String, @detail = nil : String?, @source = nil : ErrorSource?)
+      super(@title, @detail)
     end
 
     def to_cached_json(io)
