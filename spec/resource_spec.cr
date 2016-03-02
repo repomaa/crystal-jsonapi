@@ -28,7 +28,8 @@ class RelationshipsTestResource < JSONApi::Resource
   end
 
   relationships({
-    related_test: { to: :one, key: @related_test_id }
+    related_test: { to: :one, key: @related_test_id },
+    other_tests: { to: :many }
   })
 end
 
@@ -141,6 +142,46 @@ describe JSONApi::Resource do
         end
       end
       id.should eq(expected_id.to_s)
+    end
+  end
+
+  context "get_attributes" do
+    it "returns a hash of its attributes" do
+      resource = AttributesTestResource.new(1, "foo", 2)
+      resource.get_attributes.should eq({
+        attr_one: "foo",
+        attr_two: 2
+      })
+    end
+  end
+
+  context "get_relationships" do
+    it "returns a hash of its relationships types and foreign keys (if any)" do
+      resource = RelationshipsTestResource.new(1, 2)
+      resource.get_relationships.should eq({
+        related_test: { type: "related_tests", key: 2 }
+      })
+    end
+  end
+
+  context "update_attributes" do
+    it "updates the attributes from a json" do
+      resource = AttributesTestResource.new("1", "foo", 2)
+      json = %<{"attr_one":"bar","attr_two":4}>
+      resource.update_attributes(JSON::PullParser.new(json))
+      resource.attr_one.should eq("bar")
+      resource.attr_two.should eq(4)
+    end
+  end
+
+  context "update_relationships" do
+    it "updates relationships from a json" do
+      resource = RelationshipsTestResource.new(1, "2")
+      json = %<{"related_test":{"data":{"type":"related_tests","id":"3"}}}>
+      resource.update_relationships(JSON::PullParser.new(json))
+      resource.get_relationships.should eq({
+        related_test: { type: "related_tests", key: "3" }
+      })
     end
   end
 end
