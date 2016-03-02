@@ -8,7 +8,9 @@ module JSONApi
       @included = nil : (Enumerable(Resource) | Iterator(Resource))?
     )
       super(200)
-      @self_link = self_link || "#{API_ROOT}/#{@resource.type}/#{@resource.id}"
+      @self_link = self_link || @resource.try {
+        "#{API_ROOT}/#{resource.type}/#{resource.id}"
+      }
     end
 
     protected def serialize_data(object, io)
@@ -16,9 +18,10 @@ module JSONApi
     end
 
     protected def serialize_links(object, io)
+      return unless self_link = @self_link
       object.field(:links) do
         io.json_object do |object|
-          object.field(:self, @self_link)
+          object.field(:self, self_link)
         end
       end
     end
