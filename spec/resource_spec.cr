@@ -33,6 +33,21 @@ class RelationshipsTestResource < JSONApi::Resource
   })
 end
 
+class MixedTestResource < JSONApi::Resource
+  def initialize(@id, @attr_one, @attr_two, @related_test_id)
+  end
+
+  attributes({
+    attr_one: String,
+    attr_two: Int32
+  })
+
+  relationships({
+    related_test: { to: :one, key: @related_test_id },
+    other_tests: { to: :many }
+  })
+end
+
 describe JSONApi::Resource do
   context ".to_json" do
     it "returns a json object" do
@@ -179,6 +194,19 @@ describe JSONApi::Resource do
       resource = RelationshipsTestResource.new(1, "2")
       json = %<{"related_test":{"data":{"type":"related_tests","id":"3"}}}>
       resource.update_relationships(JSON::PullParser.new(json))
+      resource.get_relationships.should eq({
+        related_test: { type: "related_tests", key: "3" }
+      })
+    end
+  end
+
+  context "update" do
+    it "updates attributes and relationships from a json" do
+      resource = MixedTestResource.new(1, "foo", 2, "2")
+      json = %<{"data":{"relationships":{"related_test":{"data":{"type":"related_tests","id":"3"}}},"attributes":{"attr_one":"bar","attr_two":4}}}>
+      resource.update(JSON::PullParser.new(json))
+      resource.attr_one.should eq("bar")
+      resource.attr_two.should eq(4)
       resource.get_relationships.should eq({
         related_test: { type: "related_tests", key: "3" }
       })

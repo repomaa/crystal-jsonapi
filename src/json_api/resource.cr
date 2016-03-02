@@ -5,6 +5,18 @@ module JSONApi
   abstract class Resource
     include Cacheable
 
+    def get_attributes
+    end
+
+    def get_relationships
+    end
+
+    def update_attributes(pull)
+    end
+
+    def update_relationships(pull)
+    end
+
     macro relationships(map)
       {% for key, value in map %}
         {% map[key] = { to: value } unless value.is_a?(HashLiteral) %}
@@ -150,6 +162,22 @@ module JSONApi
           {% end %}
           else pull.skip
           end
+        end
+      end
+    end
+
+    def update(pull)
+      pull.read_object do |key|
+        case key
+        when "data"
+          pull.read_object do |key|
+            case key
+            when "attributes" then update_attributes(pull)
+            when "relationships" then update_relationships(pull)
+            else pull.skip
+            end
+          end
+        else pull.skip
         end
       end
     end
