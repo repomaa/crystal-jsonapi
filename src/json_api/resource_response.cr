@@ -1,9 +1,9 @@
 require "./success_response"
 
 module JSONApi
-  class ResourceResponse < SuccessResponse
+  class ResourceResponse(T) < SuccessResponse
     def initialize(
-      @resource : Resource?,
+      @resource : T?,
       self_link = nil : String?,
       @included = nil : (Enumerable(Resource) | Iterator(Resource))?
     )
