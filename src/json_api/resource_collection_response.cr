@@ -2,7 +2,7 @@ require "./resource"
 require "./success_response"
 
 module JSONApi
-  class ResourceCollectionResponse < SuccessResponse
+  class ResourceCollectionResponse(T) < SuccessResponse
     def initialize(
       @resources : (Enumerable(T) | Iterator(T)),
       @self_link = T.type : String,
