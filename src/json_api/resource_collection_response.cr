@@ -5,8 +5,8 @@ module JSONApi
   class ResourceCollectionResponse(T) < SuccessResponse
     def initialize(
       @resources : (Enumerable(T) | Iterator(T)),
-      @self_link = T.type : String,
-      @included = nil : (Enumerable(Resource) | Iterator(Resource))?
+      @self_link : String = T.type,
+      @included : (Enumerable(Resource) | Iterator(Resource))? = nil
     )
       {% unless JSONApi::Resource.all_subclasses.includes?(T) %}
         {% raise "resources must be an Enumerable of Resource, not #{T}" %}

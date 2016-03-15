@@ -7,7 +7,7 @@ module JSONApi
     include Cacheable
     include HasMeta
 
-    def initialize(@code : String, @title : String, @detail = nil : String?, @source = nil : ErrorSource?)
+    def initialize(@code : String, @title : String, @detail : String? = nil, @source : ErrorSource? = nil)
       super(@title, @detail)
     end
 

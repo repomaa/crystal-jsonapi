@@ -4,8 +4,8 @@ module JSONApi
   class ResourceResponse(T) < SuccessResponse
     def initialize(
       @resource : T?,
-      self_link = nil : String?,
-      @included = nil : (Enumerable(Resource) | Iterator(Resource))?
+      self_link : String? = nil,
+      @included : (Enumerable(Resource) | Iterator(Resource))? = nil
     )
       super(200)
       @self_link = self_link || @resource.try {

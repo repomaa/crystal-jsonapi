@@ -5,7 +5,7 @@ module JSONApi
   class ErrorSource
     include Cacheable
 
-    def initialize(pointer = nil : String?, parameter = nil : String?)
+    def initialize(pointer : String? = nil, parameter : String? = nil)
       raise "either pointer or parameter must be specified" unless pointer || parameter
       @pointer = pointer
       @parameter = parameter

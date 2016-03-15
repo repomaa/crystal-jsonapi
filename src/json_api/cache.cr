@@ -68,7 +68,7 @@ module JSONApi
 
     private def cleanup
       while @current_size > @max_size
-        to_delete = @cache.each.take(@delete_count).to_a
+        to_delete = @cache.each.first(@delete_count).to_a
         @cache.each.skip(@delete_count).each do |entry|
           index = to_delete.index { |old_entry|
             entry[1].last_accessed < old_entry[1].last_accessed

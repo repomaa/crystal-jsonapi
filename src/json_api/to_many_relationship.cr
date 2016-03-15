@@ -4,7 +4,7 @@ require "./cacheable"
 
 module JSONApi
   class ToManyRelationship < Relationship
-    def initialize(name, type, @ids = nil : Enumerable?, resource_link = nil)
+    def initialize(name, type, @ids : Enumerable? = nil, resource_link = nil)
       super(name, type, resource_link)
     end
 
