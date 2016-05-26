@@ -3,11 +3,12 @@ require "./error"
 
 module JSONApi
   abstract class ErrorResponse < Response
-    def initialize(error : JSONApi::Error)
-      @errors = [error]
+    def self.new(error : Error, status_code)
+      new([error], status_code)
     end
 
-    def initialize(@errors : (Enumerable(JSONApi::Error) | Iterator(JSONApi::Error)))
+    def initialize(@errors : Array(Error), status_code)
+      super(status_code)
     end
 
     protected def serialize_data(object, io)

@@ -5,8 +5,10 @@ module JSONApi
     include HasMeta
     JSON_API = { version: "1.0" }
 
+    @included : Array(Resource)?
     getter status_code
-    def initialize(@status_code)
+    def initialize(@status_code : Int32, included = nil)
+      @included = included as Array(Resource)?
     end
 
     protected abstract def serialize_data(object, io)

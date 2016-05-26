@@ -5,10 +5,7 @@ module JSONApi
     abstract def to_cached_json(io)
 
     macro def cache_key : Int32
-      [
-        {{@type.name.stringify}},
-        {{@type.instance_vars.map { |var| "@#{var}".id }.argify}}
-      ].hash
+      {{[@type.name.stringify, @type.instance_vars.map { |var| "@#{var}".id }.argify]}}.hash
     end
 
     def to_json(io)

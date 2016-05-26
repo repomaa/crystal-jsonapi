@@ -19,7 +19,7 @@ def json_object(serializer)
 end
 
 class ResourceMock < JSONApi::Resource
-  def initialize(@id)
+  def initialize(@id : Int32)
   end
 
   def self.type

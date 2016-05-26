@@ -3,14 +3,17 @@ require "./success_response"
 
 module JSONApi
   class ResourceCollectionResponse(T) < SuccessResponse
+    @included : Array(T)
+
     def initialize(
-      @resources : (Enumerable(T) | Iterator(T)),
+      @resources : Array(T),
       @self_link : String = T.type,
-      @included : (Enumerable(Resource) | Iterator(Resource))? = nil
+      included = nil
     )
       {% unless JSONApi::Resource.all_subclasses.includes?(T) %}
         {% raise "resources must be an Enumerable of Resource, not #{T}" %}
       {% end %}
+      @included = included.try &.map &.as(Resource)
     end
 
     protected def serialize_data(object, io)

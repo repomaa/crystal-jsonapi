@@ -3,6 +3,7 @@ require "./success_response"
 module JSONApi
   class RelationshipResponse < SuccessResponse
     def initialize(resource_link, @relationship : Relationship)
+      super(200)
       @self_link = "#{resource_link}/relationships/#{@relationship.name}"
       @related_link = "#{resource_link}/#{@relationship.name}"
     end

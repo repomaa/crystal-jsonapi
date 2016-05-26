@@ -1,5 +1,6 @@
 require "./cacheable"
 require "./unexpected_type_error"
+require "./types"
 
 module JSONApi
   abstract class Resource
@@ -19,7 +20,7 @@ module JSONApi
 
     macro relationships(map)
       {% for key, value in map %}
-        {% map[key] = { to: value } unless value.is_a?(HashLiteral) %}
+        {% map[key] = { to: value } unless value.is_a?(NamedTupleLiteral) %}
         {% unless map[key][:type] %}
           {% map[key][:type] = "#{key.id}#{(value[:to].id.stringify == "one" ? "s" : "").id}" %}
         {% end %}
@@ -29,6 +30,10 @@ module JSONApi
       {% end %}
 
       {% for key, value in map %}
+        {% if value[:key] && value[:key].stringify =~ /^@/ %}
+          {{value[:key].id}} : JSONApi::ID
+        {% end %}
+
         def {{key.id}}
           {% type = "JSONApi::To#{value[:to].id.camelcase}Relationship".id %}
           @{{key.id}} ||= {{type}}.new(
@@ -184,8 +189,11 @@ module JSONApi
 
     getter id
 
+    def initialize(@id : (String | Symbol | Int32))
+    end
+
     def self.type
-      @@type ||= "#{name.split("::").last.underscore}s"
+      "#{name.split("::").last.underscore}s"
     end
 
     def type

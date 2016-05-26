@@ -3,10 +3,10 @@ module JSONApi
     class Record < MemoryIO
       getter last_accessed
 
-      def initialize(@copy_io)
+      def initialize(@copy_io : IO)
+        @last_accessed = Time.now
         super()
         yield self
-        @last_accessed = Time.now
       end
 
       def write(slice)
@@ -31,7 +31,9 @@ module JSONApi
 
     getter current_size, hit_count, miss_count
 
-    def initialize(@max_size)
+    @delete_count : Int32
+
+    def initialize(@max_size : Int32)
       @cache = {} of Int32 => Record
       @current_size = 0
       @hit_count = 0_u32

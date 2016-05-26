@@ -34,7 +34,7 @@ class RelationshipsTestResource < JSONApi::Resource
 end
 
 class MixedTestResource < JSONApi::Resource
-  def initialize(@id, @attr_one, @attr_two, @related_test_id)
+  def initialize(@id, @attr_one, @attr_two, @related_test_id : Int32)
   end
 
   attributes({
@@ -181,7 +181,7 @@ describe JSONApi::Resource do
 
   context "update_attributes" do
     it "updates the attributes from a json" do
-      resource = AttributesTestResource.new("1", "foo", 2)
+      resource = AttributesTestResource.new(1, "foo", 2)
       json = %<{"attr_one":"bar","attr_two":4}>
       resource.update_attributes(JSON::PullParser.new(json))
       resource.attr_one.should eq("bar")
@@ -191,7 +191,7 @@ describe JSONApi::Resource do
 
   context "update_relationships" do
     it "updates relationships from a json" do
-      resource = RelationshipsTestResource.new(1, "2")
+      resource = RelationshipsTestResource.new(1, 2)
       json = %<{"related_test":{"data":{"type":"related_tests","id":"3"}}}>
       resource.update_relationships(JSON::PullParser.new(json))
       resource.get_relationships.should eq({
@@ -202,7 +202,7 @@ describe JSONApi::Resource do
 
   context "update" do
     it "updates attributes and relationships from a json" do
-      resource = MixedTestResource.new(1, "foo", 2, "2")
+      resource = MixedTestResource.new(1, "foo", 2, 2)
       json = %<{"data":{"relationships":{"related_test":{"data":{"type":"related_tests","id":"3"}}},"attributes":{"attr_one":"bar","attr_two":4}}}>
       resource.update(JSON::PullParser.new(json))
       resource.attr_one.should eq("bar")

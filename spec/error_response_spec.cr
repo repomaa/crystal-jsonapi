@@ -3,19 +3,19 @@ require "./spec_helper"
 describe JSONApi::ErrorResponse do
   context "new" do
     it "either takes a single error or a collection of errors" do
-      TestErrorResponse.new(JSONApi::Error.new("123", "Foobar"))
-      TestErrorResponse.new([JSONApi::Error.new("123", "Foobar")])
+      TestErrorResponse.new(JSONApi::Error.new("123", "Foobar"), 400)
+      TestErrorResponse.new([JSONApi::Error.new("123", "Foobar")], 400)
     end
   end
 
   context "to_json" do
     it "returns a json object" do
-      response = TestErrorResponse.new(JSONApi::Error.new("123", "Foobar"))
+      response = TestErrorResponse.new(JSONApi::Error.new("123", "Foobar"), 400)
       json_object(response)
     end
 
     it "add a correct errors array" do
-      response = TestErrorResponse.new(JSONApi::Error.new("123", "Foobar"))
+      response = TestErrorResponse.new(JSONApi::Error.new("123", "Foobar"), 400)
 
       code = nil
       title = nil

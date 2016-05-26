@@ -3,7 +3,7 @@ require "./spec_helper"
 class CacheableTest
   include JSONApi::Cacheable
 
-  def initialize(@foo, @bar)
+  def initialize(@foo : String, @bar : String)
   end
 
   def to_cached_json(io)
@@ -27,7 +27,7 @@ class TimesCalledTest
     @@times_called = 0
   end
 
-  def initialize(@foo, @bar)
+  def initialize(@foo : String, @bar : String)
   end
 
   def to_cached_json(io)

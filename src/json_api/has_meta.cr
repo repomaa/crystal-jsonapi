@@ -2,7 +2,9 @@ require "./meta"
 
 module JSONApi
   module HasMeta
-    private def meta : Meta+?
+    @meta : Meta?
+
+    private def meta
       @meta
     end
 

@@ -1,7 +1,7 @@
 require "./spec_helper"
 
 class TestMeta < JSONApi::Meta
-  def initialize(@foo, @bar)
+  def initialize(@foo : String, @bar : String)
   end
 end
 

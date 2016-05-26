@@ -3,6 +3,12 @@ module JSONApi
   abstract class Relationship
     include Cacheable
 
+    @name : (Symbol | String)
+    @type : (Symbol | String)
+    @resource_link : String?
+    @self_link : String?
+    @related_link : String?
+
     getter name, type
     def initialize(@name, @type, @resource_link = nil)
       @resource_link.try do |resource_link|

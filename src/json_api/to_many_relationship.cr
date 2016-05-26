@@ -1,11 +1,14 @@
 require "./relationship"
 require "./resource_identifier"
 require "./cacheable"
+require "./types"
 
 module JSONApi
   class ToManyRelationship < Relationship
-    def initialize(name, type, @ids : Enumerable? = nil, resource_link = nil)
+    @ids : Array(ID)?
+    def initialize(name, type, ids = nil, resource_link = nil)
       super(name, type, resource_link)
+      @ids = ids.try &.map &.as(ID)
     end
 
     protected def serialize_data(object, io)

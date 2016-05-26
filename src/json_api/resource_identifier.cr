@@ -4,7 +4,7 @@ module JSONApi
   class ResourceIdentifier
     include Cacheable
 
-    def initialize(@type, @id)
+    def initialize(@type : (String | Symbol), @id : (String | Symbol | Int32))
     end
 
     def to_cached_json(io)

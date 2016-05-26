@@ -2,15 +2,18 @@ require "./success_response"
 
 module JSONApi
   class ResourceResponse(T) < SuccessResponse
+    @included : Array(Resource)?
+
     def initialize(
       @resource : T?,
       self_link : String? = nil,
-      @included : (Enumerable(Resource) | Iterator(Resource))? = nil
+      included = nil
     )
       super(200)
       @self_link = self_link || @resource.try {
         "#{API_ROOT}/#{resource.type}/#{resource.id}"
       }
+      @included = included.try &.map &.as(Resource)
     end
 
     protected def serialize_data(object, io)

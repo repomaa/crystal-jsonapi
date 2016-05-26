@@ -4,7 +4,7 @@ class HasMetaTest
   include JSONApi::HasMeta
 
   class Meta < JSONApi::Meta
-    def initialize(@foo, @bar)
+    def initialize(@foo : String, @bar : String)
     end
   end
 
